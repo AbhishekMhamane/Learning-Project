@@ -1,0 +1,60 @@
+#Define deplopyment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: springboot-app-deployment
+   labels:
+      app: springboot-app
+spec:
+  selector: 
+    matchLabels:
+      app: springboot-app
+  replicas: 2
+  template: 
+    metadata: 
+      labels: 
+        app: springboot-app
+    spec: 
+      containers: 
+      - name: springboot-app
+        image: abhishekmhamane/springboot-app:v4
+        ports: 
+          - containerPort: 8080
+        env:
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                 name: app-configmap
+                 key: database_host
+          - name: DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                 name: app-configmap
+                 key: database_name
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-password
+
+---
+#Defined service
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: springboot-app
+  ports:
+    - protocol: "TCP"
+      port: 3000
+      targetPort: 8080
+      nodePort: 30010
+  

@@ -1,0 +1,27 @@
+version: "3.7"
+services: 
+    mysql:
+      image: "mysql:8.0.31"
+      restart: on-failure
+      ports: 
+        - 3307:3306
+      volumes:
+        - ./mysql:/var/lib/mysql
+      environment:
+        MYSQL_DATABASE: organizationdb
+        MYSQL_ROOT_PASSWORD: 1234 
+    organization-service:
+     # image: abhishekmhamane/springboot-app:v4
+      build:
+        context: ./organization-service
+        dockerfile: Dockerfile
+      restart: on-failure
+      ports:
+        - 8080:8080
+      environment:
+        DB_HOST: mysql
+        DB_USERNAME: root
+        DB_PASSWORD: 1234
+        DB_NAME: organizationdb
+      
+
