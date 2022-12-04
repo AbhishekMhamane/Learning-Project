@@ -1,0 +1,60 @@
+#Define deplopyment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: organization-service
+   labels:
+      app: organization-service
+spec:
+  selector: 
+    matchLabels:
+      app: organization-service
+  replicas: 2
+  template: 
+    metadata: 
+      labels: 
+        app: organization-service
+    spec: 
+      containers: 
+      - name: organization-service
+        image: abhimhamane13/organization-service:latest
+        ports: 
+          - containerPort: 8080
+        env:
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                 name: app-configmap
+                 key: database_host
+          - name: DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                 name: app-configmap
+                 key: database_name
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-password
+
+---
+#Defined service
+apiVersion: v1
+kind: Service
+metadata:
+  name: organization-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: organization-service
+  ports:
+    - protocol: "TCP"
+      port: 3000
+      targetPort: 8080
+      nodePort: 30010
+  
