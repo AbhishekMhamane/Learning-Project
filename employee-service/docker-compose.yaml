@@ -4,11 +4,11 @@ services:
       image: "mysql:8.0.31"
       restart: on-failure
       ports: 
-        - 3306:3306
+        - 3307:3306
       volumes:
         - ./mysql:/var/lib/mysql
       environment:
-        MYSQL_DATABASE: organizationdb
+        MYSQL_DATABASE: employeedb
         MYSQL_ROOT_PASSWORD: 1234 
     # organization-service:
     #   build:

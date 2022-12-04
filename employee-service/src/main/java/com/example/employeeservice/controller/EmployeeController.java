@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,12 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
-
+import java.util.*;
 import com.example.employeeservice.model.Employee;
 import com.example.employeeservice.model.Organization;
 import com.example.employeeservice.service.EmployeeService;
 
 import custom_exception.HandleCustomException;
+
 
 @RestController
 @CrossOrigin(origins="*")
@@ -32,13 +34,7 @@ public class EmployeeController {
 		this.empService=empService;
 	}
 	
-	@GetMapping(path="/{orgId}")
-	ResponseEntity<?> getEmployee(@PathVariable Integer orgId)
-	{	
-		return new ResponseEntity<Employee>(empService.getEmployee(orgId),HttpStatus.OK);
-	}
-	
-	@PostMapping(path="/{orgId}/{deptId}")
+	@PostMapping(path="/add/{orgId}/{deptId}")
 	ResponseEntity<?> addEmployee(@PathVariable("orgId") Integer orgId,@PathVariable("deptId") Integer deptId,@RequestBody Employee emp)
 	{
 		try
@@ -51,6 +47,39 @@ public class EmployeeController {
 		}
 	}
 	
+	
+	@GetMapping(path="/org/{orgId}")
+	ResponseEntity<?> getEmployeesByOrg(@PathVariable Integer orgId)
+	{	
+		return new ResponseEntity<List<Employee>>(empService.getEmployeesByOrg(orgId),HttpStatus.OK);
+	}
+	
+	@GetMapping(path="/{empId}")
+	ResponseEntity<?> getEmployeeById(@PathVariable Integer empId)
+	{
+		try
+		{
+			return new ResponseEntity<Employee>(empService.getEmployeeById(empId),HttpStatus.OK);
+		}
+		catch(HandleCustomException e)
+		{
+			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@DeleteMapping(path="/delete/{empId}")
+	ResponseEntity<?> deleteEmployeeById(@PathVariable Integer empId)
+	{
+		try
+		{
+			empService.deletetEmployeeById(empId);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		catch(HandleCustomException e)
+		{
+			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 	
 

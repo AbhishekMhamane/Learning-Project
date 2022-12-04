@@ -1,5 +1,9 @@
 package com.example.employeeservice.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -31,36 +35,7 @@ public class EmployeeService {
 		this.empRepo = empRepo;
 	}
 	
-
-	public Employee getEmployee(Integer orgId)
-	{
-        Employee emp = new Employee("abhishek","mhamane","abhi@gmail.com","12345");
-		
-        //Organization org = getOrganizationById(orgId);
-                
-        //System.out.println(org);
-		//emp.setOrg(org);
-		
-		return emp;
-	}
-	
-	public Organization getOrganizationById(Integer orgId)
-	{
-		return webClient.get()
-                .uri(orgUrl+"/org/"+orgId)
-                .retrieve()
-                        .bodyToMono(Organization.class).share().block();
-	}
-	
-	public Department getDepartmentById(Integer deptId)
-	{
-		return webClient.get()
-                .uri(orgUrl+"/dept/"+deptId)
-                .retrieve()
-                        .bodyToMono(Department.class).share().block();
-	}
-
-	public Employee addEmployee(Integer orgId, Integer deptId,Employee emp) {
+    public Employee addEmployee(Integer orgId, Integer deptId,Employee emp) {
 		
 		try
 		{
@@ -124,4 +99,118 @@ public class EmployeeService {
 		}
 
 	}
+    
+    public Employee getEmployeeById(Integer empId) {
+		
+		try
+		{
+			boolean isEmpPresent = empRepo.existsById(empId);
+			
+			if(isEmpPresent)
+			{
+				Optional<Employee> empOptional = empRepo.findById(empId);
+				
+				Employee emp = empOptional.get();
+				
+//				Organization org = getOrganizationById(emp.getOrg().getOrgId());
+//				
+//				emp.setOrg(org);
+//				
+//				Department dept = getDepartmentById(emp.getDept().getDeptId());
+//				
+//				emp.setDept(dept);
+				
+				return emp;
+			}
+			else
+			{
+				throw new HandleCustomException("400","Employee not present with given id");
+			}
+		}
+		catch(HandleCustomException e)
+		{
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+		}
+		catch(Exception e)
+		{
+			throw new HandleCustomException("400",e.getMessage());
+		}
+
+	}
+
+	public List<Employee> getEmployeesByOrg(Integer orgId)
+	{
+		try
+		{
+			//System.out.println("in the org emp");
+			Organization org = getOrganizationById(orgId);
+
+			
+			if(org!=null)
+			{
+				System.out.println(org);
+
+				List<Employee> listEmp = empRepo.findByOrgId(orgId);
+				//System.out.println(empRepo.getEmployeesByOrganization(org));
+				//List<Employee> listEmp = new ArrayList<>();
+
+				return listEmp;
+			}
+			else
+			{
+				throw new HandleCustomException("400","Organization is not present by given id");
+			}
+		}
+		catch(HandleCustomException e)
+		{
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+		}
+		catch(Exception e)
+		{
+			throw new HandleCustomException("400",e.getMessage());
+		}
+	}
+	
+	public Organization getOrganizationById(Integer orgId)
+	{
+		return webClient.get()
+                .uri(orgUrl+"/org/"+orgId)
+                .retrieve()
+                        .bodyToMono(Organization.class).share().block();
+	}
+	
+	public Department getDepartmentById(Integer deptId)
+	{
+		return webClient.get()
+                .uri(orgUrl+"/dept/"+deptId)
+                .retrieve()
+                        .bodyToMono(Department.class).share().block();
+	}
+
+
+	public void deletetEmployeeById(Integer empId) {
+		try
+		{
+			boolean isEmpPresent = empRepo.existsById(empId);
+			
+			if(isEmpPresent)
+			{
+				empRepo.deleteById(empId);
+			}
+			else
+			{
+				throw new HandleCustomException("400","Employee not present with given id");
+			}
+		}
+		catch(HandleCustomException e)
+		{
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+		}
+		catch(Exception e)
+		{
+			throw new HandleCustomException("400",e.getMessage());
+		}
+
+	}
+
 }
