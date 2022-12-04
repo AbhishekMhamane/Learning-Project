@@ -1,14 +1,23 @@
 package com.example.employeeservice.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import com.example.employeeservice.custom_exceptions.HandleCustomException;
+import com.example.employeeservice.model.Department;
 import com.example.employeeservice.model.Employee;
+import com.example.employeeservice.model.Organization;
 import com.example.employeeservice.repository.EmployeeRepository;
+
+import custom_exception.HandleCustomException;
+import reactor.core.publisher.Mono;
 
 @Service
 public class EmployeeService {
@@ -16,42 +25,25 @@ public class EmployeeService {
 	private final EmployeeRepository empRepo;
 	
 	@Autowired
+	private WebClient webClient;
+	
+	@Value("${organizationService.url}")
+	String orgUrl;
+	
+	@Autowired
 	EmployeeService(EmployeeRepository empRepo)
 	{
 		this.empRepo = empRepo;
 	}
 	
-
-	public List<Employee> getAllEmployeeByOrgId(Integer orgId) {
+	public List<Employee> getAllEmployee() {
 		try
 		{
-			return empRepo.findByOrgId(orgId);
-		}
-		catch(Exception e)
-		{
-			throw new HandleCustomException("400",e.getMessage());
-		}
-		
-	}
-	
-
-	public Employee getEmployeeByEmpId(Integer empId) {
-		try
-		{
-			Optional<Employee> empRecord = empRepo.findById(empId);
-			
-			if(empRecord.isPresent())
-			{
-				return empRecord.get();
-			}
-			else
-			{
-				throw new HandleCustomException("400","Employee not present by given emp id");
-			}
+			return empRepo.findAll();
 		}
 		catch(HandleCustomException e)
 		{
-		   throw new  HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
 		}
 		catch(Exception e)
 		{
@@ -59,131 +51,222 @@ public class EmployeeService {
 		}
 	}
 
-
-	public Employee addEmployeeToOrganization(Integer orgId, Integer deptId, Employee emp) {
+	
+    public Employee addEmployee(Integer orgId, Integer deptId,Employee emp) {
 		
 		try
 		{
-			//not added checking of org and dept is present or not
+			Organization org = getOrganizationById(orgId);
+			Department dept = getDepartmentById(deptId);
 			
-			//System.out.println(emp);
-			
-			if(emp.getFirstName() != null && emp.getLastName()!=null && emp.getEmail()!=null && emp.getMobileNo1()!=null)
+			if(org!=null)
 			{
-				Optional<Employee> empPresentByEmail = empRepo.findByEmail(emp.getEmail());
-				Optional<Employee> empPresentByMob = empRepo.findByMobileNo1(emp.getMobileNo1());
-				
-				if(!empPresentByEmail.isPresent() && !empPresentByMob.isPresent())
+				if(dept!=null)
 				{
-					emp.setOrgId(orgId);
-					emp.setDeptId(deptId);
-					
-					return empRepo.save(emp);
+				      if(!emp.getFirstName().isBlank() && !emp.getFirstName().isEmpty())	
+				      {
+				    	  if(!emp.getLastName().isBlank() && !emp.getLastName().isEmpty())
+				    	  {
+				    		  if(!emp.getEmail().isBlank() && !emp.getEmail().isEmpty())
+				    		  {
+				    			  if(!emp.getMobileNo1().isBlank() && !emp.getMobileNo1().isEmpty())
+				    			  {
+				    				  emp.setOrgId(orgId);
+				    				  emp.setDeptId(deptId);
+				    				  
+				    				  return empRepo.save(emp);
+				    			  }
+				    			  else
+				  				  {
+				  					throw new HandleCustomException("400","Enter valid mobile");
+				  				  }
+				    		  }
+				    		  else
+							  {
+								throw new HandleCustomException("400","Enter valid email");
+							  }
+				    	  }
+				    	  else
+							{
+								throw new HandleCustomException("400","Enter valid last name");
+							}
+				      }
+				      else
+						{
+							throw new HandleCustomException("400","Enter valid first name");
+						}
 				}
 				else
 				{
-					throw new HandleCustomException("400","Employee already present with email & mobile no");
+					throw new HandleCustomException("400","Department not present with given id");
 				}
 			}
 			else
 			{
-				throw new HandleCustomException("400","Please enter valid inputs !");
+				throw new HandleCustomException("400","Organization not present with given id");
 			}
-			
 		}
 		catch(HandleCustomException e)
 		{
-		   throw new  HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
 		}
 		catch(Exception e)
 		{
 			throw new HandleCustomException("400",e.getMessage());
 		}
+
+	}
+    
+   public Employee getEmployeeById(Integer empId) {
 		
-	}
-
-
-	public Employee updateEmployeeByEmpId(Integer empId, Employee emp) {
 		try
 		{
-			Optional<Employee> empOptional = empRepo.findById(empId);
+			boolean isEmpPresent = empRepo.existsById(empId);
 			
-			if(empOptional.isPresent())
+			if(isEmpPresent)
 			{
-				Employee empRecord = empOptional.get();
+				Optional<Employee> empOptional = empRepo.findById(empId);
 				
-				if(emp.getFirstName()!=null && !emp.getFirstName().equals(empRecord.getFirstName()))
-				{
-					empRecord.setFirstName(emp.getFirstName());
-				}
+				Employee emp = empOptional.get();
 				
-				if(emp.getLastName()!=null && !emp.getLastName().equals(empRecord.getLastName()))
-				{
-					empRecord.setLastName(emp.getLastName());
-				}
-				
-				if(emp.getEmail()!=null && !emp.getEmail().equals(empRecord.getEmail()))
-				{
-					empRecord.setEmail(emp.getEmail());
-				}
-				
-				if(emp.getMobileNo1()!=null && !emp.getMobileNo1().equals(empRecord.getMobileNo1()))
-				{
-					empRecord.setMobileNo1(emp.getMobileNo1());
-				}
-				
-				if(emp.getMobileNo2()!=null && !emp.getMobileNo2().equals(empRecord.getMobileNo2()))
-				{
-					empRecord.setMobileNo2(emp.getMobileNo2());
-				}
-				
-				if(emp.getDeptId()!=null && emp.getDeptId()!=empRecord.getDeptId())
-				{
-					empRecord.setDeptId(emp.getDeptId());
-				}
-				
-				return empRepo.save(empRecord);
+				return emp;
 			}
 			else
 			{
-				throw new HandleCustomException("400","Employee not present by given emp id");
+				throw new HandleCustomException("400","Employee not present with given id");
 			}
 		}
 		catch(HandleCustomException e)
 		{
-		   throw new  HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+		}
+		catch(Exception e)
+		{
+			throw new HandleCustomException("400",e.getMessage());
+		}
+
+	}
+
+	public List<Employee> getAllEmployeesByOrg(Integer orgId)
+	{
+		try
+		{
+			Organization org = getOrganizationById(orgId);
+
+			if(org!=null)
+			{
+
+				List<Employee> listEmp = empRepo.findByOrgId(orgId);
+
+				return listEmp;
+			}
+			else
+			{
+				throw new HandleCustomException("400","Organization is not present by given id");
+			}
+		}
+		catch(HandleCustomException e)
+		{
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
 		}
 		catch(Exception e)
 		{
 			throw new HandleCustomException("400",e.getMessage());
 		}
 	}
+	
+	public Organization getOrganizationById(Integer orgId)
+	{
+		return webClient.get()
+                .uri(orgUrl+"/org/"+orgId)
+                .retrieve()
+                        .bodyToMono(Organization.class).share().block();
+	}
+	
+	public Department getDepartmentById(Integer deptId)
+	{
+		return webClient.get()
+                .uri(orgUrl+"/dept/"+deptId)
+                .retrieve()
+                        .bodyToMono(Department.class).share().block();
+	}
 
 
-	public void deleteEmployeeByEmpId(Integer empId) {
+	public void deletetEmployeeById(Integer empId) {
 		try
 		{
-			Optional<Employee> empRecord = empRepo.findById(empId);
+			boolean isEmpPresent = empRepo.existsById(empId);
 			
-			if(empRecord.isPresent())
+			if(isEmpPresent)
 			{
 				empRepo.deleteById(empId);
 			}
 			else
 			{
-				throw new HandleCustomException("400","Employee not present by given emp id");
+				throw new HandleCustomException("400","Employee not present with given id");
 			}
 		}
 		catch(HandleCustomException e)
 		{
-		   throw new  HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
+		}
+		catch(Exception e)
+		{
+			throw new HandleCustomException("400",e.getMessage());
+		}
+
+	}
+
+	public Employee updateEmployeeById(Integer empId,Employee emp) {
+		try
+		{
+
+			Optional<Employee> empOptional = empRepo.findById(empId);
+
+			if(empOptional.isPresent())
+			{
+				Employee empRecord = empOptional.get();
+				
+				if(emp.getFirstName()!=null && emp.getFirstName()!=empRecord.getFirstName())
+				{
+					empRecord.setFirstName(emp.getFirstName());
+				}
+				if(emp.getLastName()!=null && emp.getLastName()!=empRecord.getLastName())
+				{
+					empRecord.setLastName(emp.getLastName());
+				}
+				if(emp.getEmail()!=null && emp.getEmail()!=empRecord.getEmail())
+				{
+					empRecord.setEmail(emp.getEmail());
+				}
+				if(emp.getMobileNo1()!=null && emp.getMobileNo1()!=empRecord.getMobileNo1())
+				{
+					empRecord.setMobileNo1(emp.getMobileNo1());
+				}
+				if(emp.getMobileNo2()!=null && emp.getMobileNo2()!=empRecord.getMobileNo2())
+				{
+					empRecord.setMobileNo2(emp.getMobileNo2());
+				}
+				if(emp.getDeptId()!=null && emp.getDeptId()!=empRecord.getDeptId())
+				{
+					empRecord.setDeptId(emp.getDeptId());
+				}
+				 
+				return empRepo.save(empRecord);
+			}
+			else
+			{
+				throw new HandleCustomException("400","Employee not present with given id");
+			}
+		}
+		catch(HandleCustomException e)
+		{
+			throw new HandleCustomException(e.getErrorCode(),e.getErrorMessage());
 		}
 		catch(Exception e)
 		{
 			throw new HandleCustomException("400",e.getMessage());
 		}
 	}
-	
-	
-	
+
 }

@@ -1,0 +1,59 @@
+#Define deplopyment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: employee-service
+   labels:
+      app: employee-service
+spec:
+  selector: 
+    matchLabels:
+      app: employee-service
+  replicas: 1
+  template: 
+    metadata: 
+      labels: 
+        app: employee-service
+    spec: 
+      containers: 
+      - name: employee-service
+        image: abhimhamane13/employee-service:latest
+        ports: 
+          - containerPort: 8081
+        env:
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                 name: app-configmap
+                 key: database_host
+          - name: DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                 name: app-configmap
+                 key: database_name
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-password
+
+---
+#Defined service
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: employee-service
+  ports:
+    - protocol: "TCP"
+      port: 3000
+      targetPort: 8081
+      nodePort: 30011

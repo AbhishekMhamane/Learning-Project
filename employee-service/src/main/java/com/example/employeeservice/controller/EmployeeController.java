@@ -1,7 +1,5 @@
 package com.example.employeeservice.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
-
-import com.example.employeeservice.custom_exceptions.HandleCustomException;
+import java.util.*;
 import com.example.employeeservice.model.Employee;
-import com.example.employeeservice.model.Organization;
 import com.example.employeeservice.service.EmployeeService;
+
+import custom_exception.HandleCustomException;
+
 
 @RestController
 @CrossOrigin(origins="*")
@@ -32,100 +31,83 @@ public class EmployeeController {
 	@Autowired
 	EmployeeController(EmployeeService empService)
 	{
-		this.empService = empService;
+		this.empService=empService;
 	}
+	
+	@GetMapping
+	ResponseEntity<?> getAllEmployee()
+	{
+		try
+		{
+			return new ResponseEntity<List<Employee>>(empService.getAllEmployee(),HttpStatus.OK);
+		}
+		catch(HandleCustomException e)
+		{
+			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping(path="/add/{orgId}/{deptId}")
+	ResponseEntity<?> addEmployee(@PathVariable("orgId") Integer orgId,@PathVariable("deptId") Integer deptId,@RequestBody Employee emp)
+	{
+		try
+		{
+			return new ResponseEntity<Employee>(empService.addEmployee(orgId,deptId,emp),HttpStatus.CREATED);
+		}
+		catch(HandleCustomException e)
+		{
+			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
 	
 	@GetMapping(path="/org/{orgId}")
-	public ResponseEntity<?> getAllEmployeeByOrgId(@PathVariable("orgId") Integer orgId)
+	ResponseEntity<?> getAllEmployeesByOrg(@PathVariable Integer orgId)
+	{	
+		return new ResponseEntity<List<Employee>>(empService.getAllEmployeesByOrg(orgId),HttpStatus.OK);
+	}
+	
+	@GetMapping(path="/get/{empId}")
+	ResponseEntity<?> getEmployeeById(@PathVariable Integer empId)
 	{
 		try
 		{
-			return new ResponseEntity<List<Employee>>(empService.getAllEmployeeByOrgId(orgId),HttpStatus.OK);
+			return new ResponseEntity<Employee>(empService.getEmployeeById(empId),HttpStatus.OK);
 		}
 		catch(HandleCustomException e)
 		{
 			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
 		}
-		
 	}
 	
-	@GetMapping(path="/{empId}")
-	public ResponseEntity<?> getEmployeeByEmpId(@PathVariable("empId") Integer empId)
+	@PutMapping(path="/update/{empId}")
+	ResponseEntity<?> updateEmployeeById(@PathVariable Integer empId,@RequestBody Employee emp)
 	{
 		try
 		{
-			return new ResponseEntity<Employee>(empService.getEmployeeByEmpId(empId),HttpStatus.OK);
+			return new ResponseEntity<Employee>(empService.updateEmployeeById(empId,emp),HttpStatus.OK);
 		}
 		catch(HandleCustomException e)
 		{
 			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
 		}
-		
 	}
 	
-	
-	@PostMapping(path="/{orgId}/{deptId}")
-	public ResponseEntity<?> addEmployeeToOrganization(@PathVariable("orgId") Integer orgId,@PathVariable("deptId") Integer deptId,
-			@RequestBody Employee emp)
+	@DeleteMapping(path="/delete/{empId}")
+	ResponseEntity<?> deleteEmployeeById(@PathVariable Integer empId)
 	{
 		try
 		{
-			return new ResponseEntity<Employee>(empService.addEmployeeToOrganization(orgId,deptId,emp),HttpStatus.CREATED);
-		}
-		catch(HandleCustomException e)
-		{
-			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
-		}
-		
-	}
-	
-	
-	@PutMapping(path="/{empId}")
-	public ResponseEntity<?> updateEmployeeByEmpId(@PathVariable("empId") Integer empId,@RequestBody Employee emp)
-	{
-		try
-		{
-			return new ResponseEntity<Employee>(empService.updateEmployeeByEmpId(empId,emp),HttpStatus.OK);
-		}
-		catch(HandleCustomException e)
-		{
-			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
-		}
-		
-	}
-	
-	@DeleteMapping(path="/{empId}")
-	public ResponseEntity<?> deleteEmployeeByEmpId(@PathVariable("empId") Integer empId)
-	{
-		try
-		{
-			empService.deleteEmployeeByEmpId(empId);
+			empService.deletetEmployeeById(empId);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 		catch(HandleCustomException e)
 		{
 			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
 		}
-		
 	}
 	
 	
-	
-//	@Autowired
-//	private RestTemplate restTemplate;
-//	
-//	String orgUrl = "http://organization-service/org/api";
-//	
-//	@GetMapping
-//	ResponseEntity<?> getEmployee()
-//	{
-//		Employee emp = new Employee(1,"abhishek mhamane");
-//		
-//		Organization org = this.restTemplate.getForObject(orgUrl, Organization.class);
-//
-//		emp.setOrg(org);
-//		
-//		return new ResponseEntity<Employee>(new Employee(),HttpStatus.OK);
-//	}
 
 }

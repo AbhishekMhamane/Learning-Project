@@ -35,10 +35,19 @@ public class Employee {
 	String mobileNo1;
 	
 	String mobileNo2;	
-	
-    Integer orgId;
-    
-    Integer deptId;
+
+	Integer orgId;
+
+	Integer deptId;
+//	@JsonIgnore
+//	@ManyToOne
+//	@JoinColumn(name="org_id")
+//	Organization org;
+//	
+//	@JsonIgnore
+//	@ManyToOne
+//	@JoinColumn(name="dept_id")
+//	Department dept;
 	
 	@OneToMany(cascade=CascadeType.ALL,mappedBy="employee")
 	List<EmpAddress> empAddress = new ArrayList<>();
@@ -61,8 +70,7 @@ public class Employee {
 	}
 
 
-	public Employee(Integer empId, String firstName, String lastName, String email, String mobileNo1, String mobileNo2,
-			Integer orgId, Integer deptId) {
+	public Employee(Integer empId, String firstName, String lastName, String email, String mobileNo1, String mobileNo2) {
 		super();
 		this.empId = empId;
 		this.firstName = firstName;
@@ -70,20 +78,14 @@ public class Employee {
 		this.email = email;
 		this.mobileNo1 = mobileNo1;
 		this.mobileNo2 = mobileNo2;
-		this.orgId = orgId;
-		this.deptId = deptId;
 	}
 	
-	public Employee(String firstName, String lastName, String email, String mobileNo1, String mobileNo2,
-			Integer orgId, Integer deptId) {
+	public Employee(String firstName, String lastName, String email, String mobileNo1) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.mobileNo1 = mobileNo1;
-		this.mobileNo2 = mobileNo2;
-		this.orgId = orgId;
-		this.deptId = deptId;
 	}
 
 
@@ -147,6 +149,24 @@ public class Employee {
 	}
 
 	
+//	public Organization getOrg() {
+//		return org;
+//	}
+//
+//
+//	public void setOrg(Organization org) {
+//		this.org = org;
+//	}
+//
+//
+//	public Department getDept() {
+//		return dept;
+//	}
+//
+//
+//	public void setDept(Department dept) {
+//		this.dept = dept;
+//	}
 
 
 	public Integer getOrgId() {
@@ -218,5 +238,14 @@ public class Employee {
 	}
 
 
-
+//	@Override
+//	public String toString() {
+//		return "Employee [empId=" + empId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+//				+ ", mobileNo1=" + mobileNo1 + ", mobileNo2=" + mobileNo2 + ", org=" + org + ", dept=" + dept
+//				+ ", empAddress=" + empAddress + ", salaryDetails=" + salaryDetails + ", payrollList=" + payrollList
+//				+ ", leaveList=" + leaveList + "]";
+//	}
+	
+	
+		
 }

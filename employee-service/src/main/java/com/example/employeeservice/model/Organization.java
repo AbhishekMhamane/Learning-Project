@@ -1,6 +1,5 @@
 package com.example.employeeservice.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -26,10 +25,10 @@ public class Organization {
 	String orgMobileNo;
 	
 	@OneToMany(cascade=CascadeType.ALL,mappedBy="org")
-	List<OrgOfficeLocation> orgOfficeLocation = new ArrayList<OrgOfficeLocation>();
+	List<OrgAddress> orgAddress;
 	
 	@OneToMany(cascade=CascadeType.ALL,mappedBy="org")
-	List<Department> deptList = new ArrayList<Department>();
+	List<Department> deptList;
 	
 	
 	public Organization(Integer orgId, String orgName, String orgOwner, String orgEmail, String orgMobileNo) {
@@ -91,23 +90,6 @@ public class Organization {
 
 	public void setOrgMobileNo(String orgMobileNo) {
 		this.orgMobileNo = orgMobileNo;
-	}
-	
-
-	public List<OrgOfficeLocation> getOrgOfficeLocation() {
-		return orgOfficeLocation;
-	}
-
-	public void setOrgOfficeLocation(List<OrgOfficeLocation> orgOfficeLocation) {
-		this.orgOfficeLocation = orgOfficeLocation;
-	}
-
-	public List<Department> getDeptList() {
-		return deptList;
-	}
-
-	public void setDeptList(List<Department> deptList) {
-		this.deptList = deptList;
 	}
 
 	@Override

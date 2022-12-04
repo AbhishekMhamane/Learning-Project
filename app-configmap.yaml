@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
    name: app-configmap
 data:
-  database_host: mysql.database
+  database_host: mysql
   database_name: organizationdb
