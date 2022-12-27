@@ -1,0 +1,13 @@
+# helmfile for demo
+# we can add repos in helmfile
+# repositories:
+# - name : <repository-name>
+#   url: <url>
+
+releases:
+- name: mysql
+  chart: ./mysql-chart
+  installed: true
+- name: organization-service
+  chart: ./organization-chart
+  installed: true

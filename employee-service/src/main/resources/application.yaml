@@ -4,7 +4,7 @@ server:
 spring:
     datasource:
 #        url: jdbc:mysql://${DB_HOST}/${DB_NAME}
-        url: jdbc:mysql://localhost:3306/employeedb
+        url: jdbc:mysql://localhost:3307/employeedb
         driver-class-name: com.mysql.cj.jdbc.Driver
         username: root
         password: 1234
