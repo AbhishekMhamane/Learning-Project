@@ -1,11 +1,14 @@
-# Default values for organization-chart.
+# Default values for demo-app.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+app:
+  env: qa
 
 replicaCount: 1
 
 image:
-  repository: abhimhamane13/organization-service:latest
+  repository: 
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -37,9 +40,8 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: LoadBalancer
-  port: 3000
-  targetPort: 8080
+  type: ClusterIP
+  port: 80
 
 ingress:
   enabled: false

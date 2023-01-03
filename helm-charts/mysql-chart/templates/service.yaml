@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "mysql-chart.selectorLabels" . | nindent 4 }}
+    {{- include "mysql-chart.labels" . | nindent 4 }}

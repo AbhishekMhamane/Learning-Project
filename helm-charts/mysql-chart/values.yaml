@@ -2,6 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+app:
+  env: dev
+
+mysql:
+  username: cm9vdA==
+  password: MTIzNA==
+  database: organizationdb
+  
 replicaCount: 1
 
 image:

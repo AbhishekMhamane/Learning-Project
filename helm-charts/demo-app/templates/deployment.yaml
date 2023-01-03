@@ -1,17 +1,16 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: {{ include "mysql-chart.fullname" . }}
+  name: {{ include "demo-app.fullname" . }}
   labels:
-    {{- include "mysql-chart.labels" . | nindent 4 }}
+    {{- include "demo-app.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   {{- end }}
   selector:
     matchLabels:
-      {{- include "mysql-chart.selectorLabels" . | nindent 6 }}
-  serviceName: {{ .Values.service.name}}
+      {{- include "demo-app.labels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,36 +18,31 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "mysql-chart.selectorLabels" . | nindent 8 }}
+        {{- include "demo-app.labels" . | nindent 6 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "mysql-chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "demo-app.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}"
+          image: {{ .Values.image.repository }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-          - name: MYSQL_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                 name: mysql-secret
-                 key: mysql-password
-          - name: MYSQL_DATABASE
-            value: "organizationdb"
           ports:
             - name: http
-              containerPort: 3306
+              containerPort: 80
               protocol: TCP
-          volumeMounts: 
-          - name: mysql-persistent-storage
-            mountPath: /var/lib/mysql 
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -63,7 +57,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: mysql-persistent-storage
-          persistentVolumeClaim:
-            claimName: mysql-pv-claim

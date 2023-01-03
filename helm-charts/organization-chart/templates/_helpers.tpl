@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "mysql-chart.name" -}}
+{{- define "organization-chart.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "mysql-chart.fullname" -}}
+{{- define "organization-chart.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,36 +26,32 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "mysql-chart.chart" -}}
+{{- define "organization-chart.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "mysql-chart.labels" -}}
-helm.sh/chart: {{ include "mysql-chart.chart" . }}
-{{ include "mysql-chart.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- define "organization-chart.labels" -}}
+app: {{ .Release.Name }}
+env: {{ .Values.app.env}}
 {{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "mysql-chart.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "mysql-chart.name" . }}
+{{- define "organization-chart.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "organization-chart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "mysql-chart.serviceAccountName" -}}
+{{- define "organization-chart.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "mysql-chart.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "organization-chart.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

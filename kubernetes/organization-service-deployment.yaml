@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-   name: organization-service
+   name: organization-service-deployment
    labels:
       app: organization-service
 spec:
