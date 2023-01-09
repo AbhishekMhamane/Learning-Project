@@ -4,10 +4,23 @@
 # - name : <repository-name>
 #   url: <url>
 
+templates:
+  org: &org
+    namespace: default
+    chart: ./organization-chart
+    values: 
+     - ./test-values.yaml
+
 releases:
 - name: mysql
+  namespace: default
   chart: ./mysql-chart
-  installed: true
 - name: organization-service
-  chart: ./organization-chart
-  installed: true
+  <<: *org
+
+# - name: organization-service
+#   namespace: default
+#   chart: ./organization-chart
+#   values:
+#   - ./test-values.yaml
+#   installed: true
