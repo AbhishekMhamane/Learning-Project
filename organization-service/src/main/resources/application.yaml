@@ -1,5 +1,5 @@
 server: 
-    port: 8081
+    port: 8080
     
 spring:
     datasource:
@@ -14,6 +14,12 @@ spring:
         database-platform: org.hibernate.dialect.MySQL5Dialect
         hibernate: 
             ddl-auto: update
+    kafka:
+        boostrap-servers: localhost:9092
+        
+org.topic.name: org_events
+        
+                               
 
 # server.port:8080
 # #spring.datasource.url=jdbc:mysql://${DB_HOST}/${DB_NAME}?useSSL=false

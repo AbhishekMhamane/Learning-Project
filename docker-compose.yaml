@@ -1,15 +1,25 @@
 version: "3.7"
 services: 
-    mysql:
+    org-db:
       image: "mysql:8.0.31"
       restart: on-failure
       ports: 
         - 3306:3306
       volumes:
-        - ./mysql:/var/lib/mysql
+        - ./org-mysql:/var/lib/mysql
       environment:
         MYSQL_DATABASE: organizationdb
         MYSQL_ROOT_PASSWORD: 1234 
+    emp-db:
+      image: "mysql:8.0.31"
+      restart: on-failure
+      ports: 
+        - 3307:3306
+      volumes:
+        - ./emp-mysql:/var/lib/mysql
+      environment:
+        MYSQL_DATABASE: employeedb
+        MYSQL_ROOT_PASSWORD: 1234
     # organization-service:
     #   build:
     #     context: ./organization-service
