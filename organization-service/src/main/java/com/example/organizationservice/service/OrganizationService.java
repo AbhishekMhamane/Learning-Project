@@ -2,9 +2,11 @@ package com.example.organizationservice.service;
 
 import java.util.List;
 import java.util.Optional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.organizationservice.custom_exceptions.HandleCustomExceptions;
@@ -12,13 +14,19 @@ import com.example.organizationservice.model.Organization;
 import com.example.organizationservice.model.OrgOfficeLocation;
 import com.example.organizationservice.repository.OrgOfficeLocationRepository;
 import com.example.organizationservice.repository.OrganizationRepository;
+import com.example.organizationservice.kafka.OrganizationEventProducer;
 
 @Service
 public class OrganizationService {
 
+	private static final Logger log = LoggerFactory.getLogger(OrganizationService.class);
+
 	private final OrganizationRepository orgRepository;
 	private final OrgOfficeLocationRepository orgAddRepository;
 	
+	@Autowired
+	private OrganizationEventProducer producer;
+
 	@Autowired
 	OrganizationService(OrganizationRepository orgRepository,OrgOfficeLocationRepository orgAddRepository)
 	{
@@ -31,6 +39,7 @@ public class OrganizationService {
 		return orgRepository.findAll();
 	}
 	
+	@Transactional
 	public Organization addNewOrganization(Organization org)
 	{
 		try
@@ -50,7 +59,9 @@ public class OrganizationService {
 						
 						if(!orgRecordByMobile.isPresent())
 						{
-							return orgRepository.save(org);
+							Organization newOrg = orgRepository.save(org);
+							producer.sendOrganizationEvent(newOrg, false);
+							return newOrg;
 						}
 						else
 						{
@@ -115,12 +126,14 @@ public class OrganizationService {
 	{
 		try
 		{
-			boolean isOrgPresent = orgRepository.existsById(orgId);
-			
-			if(isOrgPresent)
+			//boolean isOrgPresent = orgRepository.existsById(orgId);
+			Optional<Organization> optionalOrg = orgRepository.findById(orgId);
+
+			if(optionalOrg.isPresent())
 			{
-				System.out.println(isOrgPresent);
+				Organization org = optionalOrg.get();
 				orgRepository.deleteById(orgId);
+				producer.sendOrganizationEvent(org,true);
 			}
 			else
 			{
@@ -168,7 +181,9 @@ public class OrganizationService {
 					throw new HandleCustomExceptions("404","Please enter valid attributes of organization");
 				}
 				
-				return orgRepository.save(orgRecord);
+				Organization updatedOrg = orgRepository.save(orgRecord);
+				producer.sendOrganizationEvent(updatedOrg,false);
+				return updatedOrg;
 					
 			}
 			else

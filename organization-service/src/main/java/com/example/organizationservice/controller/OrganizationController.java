@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.organizationservice.custom_exceptions.HandleCustomExceptions;
-import com.example.organizationservice.kafka.KafkaProducer;
 import com.example.organizationservice.model.Organization;
 import com.example.organizationservice.model.OrgOfficeLocation;
 import com.example.organizationservice.service.OrganizationService;
@@ -33,13 +32,11 @@ public class OrganizationController {
 	Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 	
 	private final OrganizationService orgService;
-	private KafkaProducer kafkaProducer;
 	
 	@Autowired
-	OrganizationController(OrganizationService orgService, KafkaProducer kafkaProducer)
+	OrganizationController(OrganizationService orgService)
 	{
 		this.orgService = orgService;
-		this.kafkaProducer = kafkaProducer;
 	}
 
 	@GetMapping
@@ -67,9 +64,7 @@ public class OrganizationController {
 	{
 		try
 		{
-			Organization newOrg = orgService.addNewOrganization(org);
-			kafkaProducer.sendOrganization(newOrg);
-			return new ResponseEntity<Organization>(newOrg,HttpStatus.CREATED);
+			return new ResponseEntity<Organization>(orgService.addNewOrganization(org),HttpStatus.CREATED);
 		}
 		catch(HandleCustomExceptions e)
 		{

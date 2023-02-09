@@ -1,8 +1,9 @@
 package com.example.organizationservice.kafka;
 
+import com.example.organizationservice.event_dtos.OrganizationEvent;
+import com.example.organizationservice.model.Organization;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -19,29 +20,33 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
-import com.example.organizationservice.model.Organization;
-
 @Service
-public class KafkaProducer {
+public class OrganizationEventProducer {
 
-	@Value("${org.topic.name}")
-	String orgTopicName;
-	
-	//private static final Logger LOGGER =LoggerFactory.getLogger(KafkaProducer.class);
-      
-	  
-	  @Autowired 
-	  KafkaTemplate<String,Organization> kafkaOrgTemp;
-	  
-	  public void sendOrganization(Organization org) {
-		  
-	  //Logger.info(String.format(, null))
-	  System.out.println("Producer sending new organization details on kafka");
-	  System.out.println(org); Message<Organization> message = MessageBuilder
-	  .withPayload(org) .setHeader(KafkaHeaders.TOPIC, orgTopicName) .build();
-	  
-	  kafkaOrgTemp.send(message);
-	  
-	  }
-	 
+  @Value("${org.topic.name}")
+  String orgTopicName;
+
+  private static final Logger log = LoggerFactory.getLogger(
+    OrganizationEventProducer.class
+  );
+
+  @Autowired
+  KafkaTemplate<String, OrganizationEvent> kafkaOrgTemp;
+
+  public void sendOrganizationEvent(Organization org, boolean isDelete) {
+    log.info("Organization event triggered");
+
+    OrganizationEvent orgEvent = new OrganizationEvent();
+    orgEvent.setOrganization(org);
+    orgEvent.setDelete(isDelete);
+
+    log.info(orgEvent.toString());
+
+    Message<OrganizationEvent> message = MessageBuilder
+      .withPayload(orgEvent)
+      .setHeader(KafkaHeaders.TOPIC, orgTopicName)
+      .build();
+
+    kafkaOrgTemp.send(message);
+  }
 }

@@ -18,7 +18,7 @@ spring:
         boostrap-servers: localhost:9092
         
 org.topic.name: org_events
-        
+dept.topic.name: dept_events        
                                
 
 # server.port:8080

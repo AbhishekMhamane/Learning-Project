@@ -11,13 +11,17 @@ import com.example.organizationservice.model.Department;
 import com.example.organizationservice.model.Organization;
 import com.example.organizationservice.repository.DepartmentRepository;
 import com.example.organizationservice.repository.OrganizationRepository;
+import com.example.organizationservice.kafka.DepartmentEventProducer;
 
 @Service
 public class DepartmentService {
 
 	private final DepartmentRepository deptRepo;
 	private final OrganizationRepository orgRepo;
-	
+
+	@Autowired
+	private DepartmentEventProducer deptProducer;
+
 	@Autowired
 	DepartmentService(DepartmentRepository deptRepo,OrganizationRepository orgRepo)
 	{
@@ -68,7 +72,9 @@ public class DepartmentService {
 				if(!isDeptPresent.isPresent())
 				{
 					dept.setOrg(orgRecord);
-					return deptRepo.save(dept);	
+					Department newDept = deptRepo.save(dept);
+					deptProducer.sendDepartmentEvent(newDept,false);
+					return newDept;
 				}
 				else
 				{
@@ -112,7 +118,9 @@ public class DepartmentService {
 					deptRecord.setDeptOwner(updateDept.getDeptOwner());
 				}
 				
-				return deptRepo.save(deptRecord);
+				Department updatedDept = deptRepo.save(deptRecord);
+				deptProducer.sendDepartmentEvent(updatedDept,false);
+				return updatedDept;
 				
 			}
 			else
@@ -134,11 +142,14 @@ public class DepartmentService {
 		
 		try 
 		{
-			boolean isDeptPresent = deptRepo.existsById(deptId);
-			
-			if(isDeptPresent)
+			//boolean isDeptPresent = deptRepo.existsById(deptId);
+			Optional<Department> departmentOp = deptRepo.findById(deptId);
+
+			if(departmentOp.isPresent())
 			{
+				Department department = departmentOp.get();
 				deptRepo.deleteById(deptId);
+				deptProducer.sendDepartmentEvent(department,true);
 			}
 			else
 			{

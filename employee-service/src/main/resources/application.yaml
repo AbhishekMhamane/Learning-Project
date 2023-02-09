@@ -16,9 +16,16 @@ spring:
             ddl-auto: update
     kafka:
         boostrap-servers: localhost:9092
+        # consumer:
+        #     group-id: org_group
+        #     auto-offset-reset: earliest
+        #     key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        #     value-deserializer: org.apache.kafka.support.serializer.JsonDeserializer
         
 org.topic.name: org_events
 org.group-id: org_group
+# dept.topic.name: dept_events        
+# dept.group-id: dept_group
 
 
 organizationService.url: http://localhost:8080/api/v1

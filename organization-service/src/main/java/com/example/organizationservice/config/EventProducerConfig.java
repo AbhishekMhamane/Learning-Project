@@ -16,28 +16,38 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.example.organizationservice.model.Organization;
+import com.example.organizationservice.event_dtos.DepartmentEvent;
+import com.example.organizationservice.event_dtos.OrganizationEvent;
 
 @EnableKafka
 @Configuration
-public class KafkaConfiguration {
+public class EventProducerConfig {
 
 	@Value("${spring.kafka.boostrap-servers}")
 	String boostrap_servers;
 	
 	@Value("${org.topic.name}")
 	String orgTopicName;
+
+	@Value("${dept.topic.name}")
+	String deptTopicName;
 	
 	@Bean
 	public NewTopic orgTopic()
 	{
 		return TopicBuilder.name(orgTopicName).build();
 	}
+
+	@Bean
+	public NewTopic deptTopic()
+	{
+		return TopicBuilder.name(deptTopicName).build();
+	}
 	
 	// producer config for organization
 	
 	@Bean
-	public ProducerFactory<String, Organization> orgProducerFactory() {
+	public ProducerFactory<String, OrganizationEvent> orgProducerFactory() {
 	      Map<String, Object> configProps = new HashMap<>();
 	      configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, boostrap_servers);
 	      configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -46,8 +56,22 @@ public class KafkaConfiguration {
 	   }
 	  
 	 @Bean
-	 public KafkaTemplate<String, Organization> kafkaTemplate() {
+	 public KafkaTemplate<String, OrganizationEvent> kafkaOrgTemplate() {
 	      return new KafkaTemplate<>(orgProducerFactory());
+	   }
+	
+	@Bean
+	public ProducerFactory<String, DepartmentEvent> deptProducerFactory() {
+	      Map<String, Object> configProps = new HashMap<>();
+	      configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, boostrap_servers);
+	      configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+	      configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+	      return new DefaultKafkaProducerFactory<>(configProps);
+	   }
+	  
+	 @Bean
+	 public KafkaTemplate<String, DepartmentEvent> kafkaDeptTemplate() {
+	      return new KafkaTemplate<>(deptProducerFactory());
 	   }
 	
 	

@@ -11,12 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.example.employeeservice.model.Department;
+import com.example.employeeservice.custom_exceptions.HandleCustomException;
 import com.example.employeeservice.model.Employee;
-import com.example.employeeservice.model.Organization;
 import com.example.employeeservice.repository.EmployeeRepository;
+import com.example.organizationservice.model.*;
 
-import custom_exception.HandleCustomException;
 import reactor.core.publisher.Mono;
 
 @Service
