@@ -1,4 +1,4 @@
-package com.example.organizationservice.model;
+package com.example.employeeservice.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,6 @@ import jakarta.persistence.OneToMany;
 public class Organization {
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
 	Integer orgId;
 	
 	String orgName;
@@ -24,13 +23,7 @@ public class Organization {
 	String orgEmail;
 	
 	String orgMobileNo;
-	
-	@OneToMany(cascade=CascadeType.ALL,mappedBy="org")
-	List<OrgOfficeLocation> orgOfficeLocation = new ArrayList<OrgOfficeLocation>();
-	
-	@OneToMany(cascade=CascadeType.ALL,mappedBy="org")
-	List<Department> deptList = new ArrayList<Department>();
-	
+
 	
 	public Organization(Integer orgId, String orgName, String orgOwner, String orgEmail, String orgMobileNo) {
 		super();
@@ -91,23 +84,6 @@ public class Organization {
 
 	public void setOrgMobileNo(String orgMobileNo) {
 		this.orgMobileNo = orgMobileNo;
-	}
-	
-
-	public List<OrgOfficeLocation> getOrgOfficeLocation() {
-		return orgOfficeLocation;
-	}
-
-	public void setOrgOfficeLocation(List<OrgOfficeLocation> orgOfficeLocation) {
-		this.orgOfficeLocation = orgOfficeLocation;
-	}
-
-	public List<Department> getDeptList() {
-		return deptList;
-	}
-
-	public void setDeptList(List<Department> deptList) {
-		this.deptList = deptList;
 	}
 
 	@Override

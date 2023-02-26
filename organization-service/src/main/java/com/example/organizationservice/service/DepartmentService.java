@@ -1,6 +1,5 @@
 package com.example.organizationservice.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +64,6 @@ public class DepartmentService {
 			{
 				Organization orgRecord = orgOptional.get();
 			
-				//System.out.println(deptRepo.findByDepartmentByOrgIdAndDeptName(orgId,dept.getDeptName()));
 				
                 Optional<Department> isDeptPresent = deptRepo.findByDepartmentByOrgIdAndDeptName(orgId,dept.getDeptName());
 				
@@ -103,7 +101,6 @@ public class DepartmentService {
 		{
 			Optional<Department> deptOptional = deptRepo.findById(deptId);
 			
-			//System.out.println(updateDept);
 			if(deptOptional.isPresent())
 			{
 				Department deptRecord = deptOptional.get();
@@ -142,7 +139,6 @@ public class DepartmentService {
 		
 		try 
 		{
-			//boolean isDeptPresent = deptRepo.existsById(deptId);
 			Optional<Department> departmentOp = deptRepo.findById(deptId);
 
 			if(departmentOp.isPresent())

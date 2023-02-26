@@ -10,7 +10,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +27,8 @@ public class DepartmentEventProducer {
 
   public void sendDepartmentEvent(Department dept, boolean isDelete) {
     DepartmentEvent event = new DepartmentEvent(dept, isDelete);
-    log.info("DepartmentEvent triggered : " + event);
+    log.info("DepartmentEvent triggered ");
+    log.info(event.toString());
 
     Message<DepartmentEvent> message = MessageBuilder
       .withPayload(event)

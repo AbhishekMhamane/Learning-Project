@@ -1,4 +1,4 @@
-package com.example.organizationservice.model;
+package com.example.employeeservice.model;
 
 import java.util.List;
 import jakarta.persistence.CascadeType;
@@ -15,31 +15,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Department {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
 	Integer deptId;
 	
 	String deptName;
 	
 	String deptOwner;
-	
-	@ManyToOne
-	@JsonIgnore
-	@JoinColumn(name="org_id")
-	Organization org;
 
-
-	public Department(String deptName, String deptOwner, Organization org) {
+	public Department(String deptName, String deptOwner) {
 		super();
 		this.deptName = deptName;
 		this.deptOwner = deptOwner;
-		this.org = org;
 	}
-	public Department(Integer deptId, String deptName, String deptOwner, Organization org) {
+	public Department(Integer deptId, String deptName, String deptOwner) {
 		super();
 		this.deptId = deptId;
 		this.deptName = deptName;
 		this.deptOwner = deptOwner;
-		this.org = org;
 	}
 	public Department() {
 		super();
@@ -62,16 +53,10 @@ public class Department {
 	public void setDeptOwner(String deptOwner) {
 		this.deptOwner = deptOwner;
 	}
-	public Organization getOrg() {
-		return org;
-	}
-	public void setOrg(Organization org) {
-		this.org = org;
-	}
+
 	@Override
 	public String toString() {
-		return "Department [deptId=" + deptId + ", deptName=" + deptName + ", deptOwner=" + deptOwner + ", org=" + org
-				+ "]";
+		return "Department [deptId=" + deptId + ", deptName=" + deptName + ", deptOwner=" + deptOwner;
 	}
 	
 }
