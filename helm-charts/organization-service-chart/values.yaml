@@ -1,14 +1,24 @@
-# Default values for demo-app.
+# Default values for organization-chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 app:
-  env: qa
+   env: dev
+
+configmap:
+   name: organization-config
+   database_host: mysql
+   database_name: organizationdb
+   kafka_servers: localhost:9092
+
+db_secrets:
+  username: cm9vdA==
+  password: MTIzNA==
 
 replicaCount: 1
 
 image:
-  repository: 
+  repository: organization-service:latest
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -40,8 +50,9 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
-  port: 80
+  type: LoadBalancer
+  port: 3000
+  targetPort: 8080
 
 ingress:
   enabled: false

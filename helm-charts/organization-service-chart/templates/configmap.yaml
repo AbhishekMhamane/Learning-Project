@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+   name: {{ .Release.Name }}-configmap
+data:
+   database_host: {{ .Values.configmap.database_host }} 
+   database_name: {{ .Values.configmap.database_name }}
+   kafka_servers: {{ .Values.configmap.kafka_servers }}

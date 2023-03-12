@@ -6,9 +6,10 @@ app:
    env: dev
 
 configmap:
-   name: organization-config
+   name: employee-config
    database_host: mysql
-   database_name: organizationdb
+   database_name: employeedb
+   kafka_servers: localhost:9092
 
 db_secrets:
   username: cm9vdA==
@@ -17,7 +18,7 @@ db_secrets:
 replicaCount: 1
 
 image:
-  repository: abhimhamane13/organization-service:latest
+  repository: employee-service:latest
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

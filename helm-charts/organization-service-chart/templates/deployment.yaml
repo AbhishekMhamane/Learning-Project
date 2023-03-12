@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "organization-chart.fullname" . }}
+  name: {{ include "organization-service-chart.fullname" . }}
   labels:
-    {{- include "organization-chart.labels" . | nindent 4 }}
+    {{- include "organization-service-chart.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "organization-chart.selectorLabels" . | nindent 6 }}
+      {{- include "organization-service-chart.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,20 +18,20 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "organization-chart.selectorLabels" . | nindent 8 }}
+        {{- include "organization-service-chart.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "organization-chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "organization-service-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: abhimhamane13/organization-service:latest
+          image: {{ .Values.image.repository }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -58,6 +58,11 @@ spec:
                 secretKeyRef:
                    name: {{.Release.Name }}-db-secrets
                    key: mysql-password
+            - name: KAFKA_SERVERS
+              valueFrom:
+                secretKeyRef:
+                   name: {{.Release.Name}}-kafka-servers
+                   key: kafka_servers
           # livenessProbe:
           #   httpGet:
           #     path: /

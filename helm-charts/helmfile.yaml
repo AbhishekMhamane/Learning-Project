@@ -5,18 +5,22 @@
 #   url: <url>
 
 templates:
-  org: &org
+  organization-service: &organization-service
     namespace: default
-    chart: ./organization-chart
-    values: 
-     - ./test-values.yaml
+    chart: ./organization-service-chart
+  employee-service: &employee-service
+    namespace: default
+    chart: ./employee-service-chart
+  
 
 releases:
 - name: mysql
   namespace: default
   chart: ./mysql-chart
 - name: organization-service
-  <<: *org
+  <<: *organization-service
+- name: employee-service
+  <<: *employee-service
 
 # - name: organization-service
 #   namespace: default
