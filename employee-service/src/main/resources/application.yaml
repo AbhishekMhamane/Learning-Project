@@ -1,21 +1,22 @@
 server: 
-    port: 8081
+    port: 8080
     
 spring:
     datasource:
-#        url: jdbc:mysql://${DB_HOST}/${DB_NAME}
-        url: jdbc:mysql://localhost:3307/employeedb
+        url: jdbc:mysql://${DB_HOST}/${DB_NAME}
         driver-class-name: com.mysql.cj.jdbc.Driver
-        username: root
-        password: 1234
-#        username: ${DB_USERNAME}
-#        password: ${DB_PASSWORD}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+        # url: jdbc:mysql://localhost:3307/employeedb
+        # username: root
+        # password: 1234
     jpa: 
         database-platform: org.hibernate.dialect.MySQL5Dialect
         hibernate: 
             ddl-auto: update
     kafka:
-        boostrap-servers: localhost:9092
+        boostrap-servers: ${KAFKA_SERVERS}
+        # boostrap-servers: localhost:9092
         
 org.topic.name: org_events
 org.group-id: org_group

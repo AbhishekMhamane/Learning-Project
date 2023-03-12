@@ -19,7 +19,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 
 @EnableKafka
 @Configuration
-public class EventProducerConfig {
+public class KafkaConfig {
 
   @Value("${spring.kafka.boostrap-servers}")
   String boostrap_servers;
