@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import java.util.*;
 
 @Service
 public class Consumers {
@@ -60,10 +61,13 @@ public class Consumers {
 
     Department dept = new Department();
 
-    dept.setDeptId(deptEvent.getDepartment().getDeptId());
-    dept.setDeptName(deptEvent.getDepartment().getDeptName());
-    dept.setDeptOwner(deptEvent.getDepartment().getDeptOwner());
+    dept.setDeptId(deptEvent.getDept().getDeptId());
+    dept.setDeptName(deptEvent.getDept().getDeptName());
+    dept.setDeptOwner(deptEvent.getDept().getDeptOwner());
 
+    Optional<Organization> orgOp = orgRepo.findById(deptEvent.getOrg().getOrgId());
+    dept.setOrg(orgOp.get());
+    
     if (!deptEvent.isDelete()) {
       deptRepo.save(dept);
       log.info("Saved department in db " + dept.toString());

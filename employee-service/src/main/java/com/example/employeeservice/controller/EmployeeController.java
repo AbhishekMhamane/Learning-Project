@@ -63,8 +63,26 @@ public class EmployeeController {
 	
 	@GetMapping(path="/org/{orgId}")
 	ResponseEntity<?> getAllEmployeesByOrg(@PathVariable Integer orgId)
-	{	
+	{	try
+		{
 		return new ResponseEntity<List<Employee>>(empService.getAllEmployeesByOrg(orgId),HttpStatus.OK);
+		}
+		catch(HandleCustomException e)
+		{
+			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping(path="/dept/{deptId}")
+	ResponseEntity<?> getAllEmployeesByDept(@PathVariable Integer deptId)
+	{	try
+		{
+		return new ResponseEntity<List<Employee>>(empService.getAllEmployeesByDept(deptId),HttpStatus.OK);
+		}
+		catch(HandleCustomException e)
+		{
+			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	@GetMapping(path="/get/{empId}")
@@ -86,6 +104,19 @@ public class EmployeeController {
 		try
 		{
 			return new ResponseEntity<Employee>(empService.updateEmployeeById(empId,emp),HttpStatus.OK);
+		}
+		catch(HandleCustomException e)
+		{
+			return new ResponseEntity<HandleCustomException>(e,HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PutMapping(path="/update/emp/dept/{empId}/{deptId}")
+	ResponseEntity<?> updateEmployeeDepartment(@PathVariable Integer empId, @PathVariable Integer deptId)
+	{
+		try
+		{
+			return new ResponseEntity<Employee>(empService.updateEmployeeDepartment(empId, deptId),HttpStatus.OK);
 		}
 		catch(HandleCustomException e)
 		{

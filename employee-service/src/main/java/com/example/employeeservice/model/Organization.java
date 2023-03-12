@@ -1,14 +1,14 @@
 package com.example.employeeservice.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import java.util.List;
+import jakarta.persistence.CascadeType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.employeeservice.model.Organization;
+import com.example.employeeservice.model.Department;
 
 @Entity
 public class Organization {
@@ -24,7 +24,13 @@ public class Organization {
 	
 	String orgMobileNo;
 
-	
+	@OneToMany(mappedBy = "org", cascade = CascadeType.ALL)
+	@JsonIgnore
+	List<Employee> emp;
+
+	@OneToMany(mappedBy = "org", cascade = CascadeType.ALL)
+	List<Department> dept;
+
 	public Organization(Integer orgId, String orgName, String orgOwner, String orgEmail, String orgMobileNo) {
 		super();
 		this.orgId = orgId;
@@ -84,6 +90,22 @@ public class Organization {
 
 	public void setOrgMobileNo(String orgMobileNo) {
 		this.orgMobileNo = orgMobileNo;
+	}
+
+	public List<Employee> getEmp() {
+		return emp;
+	}
+
+	public void setEmp(List<Employee> emp) {
+		this.emp = emp;
+	}
+
+	public List<Department> getDept() {
+		return dept;
+	}
+
+	public void setDept(List<Department> dept) {
+		this.dept = dept;
 	}
 
 	@Override

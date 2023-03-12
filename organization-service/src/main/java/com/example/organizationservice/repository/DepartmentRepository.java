@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.organizationservice.model.Department;
-import com.example.organizationservice.model.Organization;
 
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department,Integer> {

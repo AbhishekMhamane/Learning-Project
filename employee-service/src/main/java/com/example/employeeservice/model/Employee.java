@@ -3,6 +3,7 @@ package com.example.employeeservice.model;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,9 +15,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
+import com.example.employeeservice.model.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.employeeservice.model.Department;
 
 @Entity
 @Table(name="Employee")
@@ -36,19 +38,14 @@ public class Employee {
 	
 	String mobileNo2;	
 
-	Integer orgId;
-
-	Integer deptId;
-//	@JsonIgnore
-//	@ManyToOne
-//	@JoinColumn(name="org_id")
-//	Organization org;
-//	
-//	@JsonIgnore
-//	@ManyToOne
-//	@JoinColumn(name="dept_id")
-//	Department dept;
+	@ManyToOne
+	@JoinColumn(name="org_id")
+	Organization org;
 	
+	@ManyToOne
+	@JoinColumn(name="dept_id")
+	Department dept;
+
 	@OneToMany(cascade=CascadeType.ALL,mappedBy="employee")
 	List<EmpAddress> empAddress = new ArrayList<>();
 
@@ -147,47 +144,25 @@ public class Employee {
 	public void setMobileNo2(String mobileNo2) {
 		this.mobileNo2 = mobileNo2;
 	}
-
-	
-//	public Organization getOrg() {
-//		return org;
-//	}
-//
-//
-//	public void setOrg(Organization org) {
-//		this.org = org;
-//	}
-//
-//
-//	public Department getDept() {
-//		return dept;
-//	}
-//
-//
-//	public void setDept(Department dept) {
-//		this.dept = dept;
-//	}
-
-
-	public Integer getOrgId() {
-		return orgId;
+    
+	public Organization getOrg() {
+		return org;
 	}
 
 
-	public void setOrgId(Integer orgId) {
-		this.orgId = orgId;
+	public void setOrg(Organization org) {
+		this.org = org;
 	}
 
 
-	public Integer getDeptId() {
-		return deptId;
+	public Department getDept() {
+		return dept;
 	}
 
 
-	public void setDeptId(Integer deptId) {
-		this.deptId = deptId;
+	public void setDept(Department dept) {
+		this.dept = dept;
 	}
-
 
 	public List<EmpAddress> getEmpAddress() {
 		return empAddress;
@@ -232,21 +207,10 @@ public class Employee {
 	@Override
 	public String toString() {
 		return "Employee [empId=" + empId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
-				+ ", mobileNo1=" + mobileNo1 + ", mobileNo2=" + mobileNo2 + ", orgId=" + orgId + ", deptId=" + deptId
+				+ ", mobileNo1=" + mobileNo1 + ", mobileNo2=" + mobileNo2 + ", org=" + org + ", dept=" + dept
 				+ ", empAddress=" + empAddress + ", salaryDetails=" + salaryDetails + ", payrollList=" + payrollList
 				+ ", leaveList=" + leaveList + "]";
-	}
-
-
-//	@Override
-//	public String toString() {
-//		return "Employee [empId=" + empId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
-//				+ ", mobileNo1=" + mobileNo1 + ", mobileNo2=" + mobileNo2 + ", org=" + org + ", dept=" + dept
-//				+ ", empAddress=" + empAddress + ", salaryDetails=" + salaryDetails + ", payrollList=" + payrollList
-//				+ ", leaveList=" + leaveList + "]";
-//	}
-	
-	
+	}	
 		
 }
 

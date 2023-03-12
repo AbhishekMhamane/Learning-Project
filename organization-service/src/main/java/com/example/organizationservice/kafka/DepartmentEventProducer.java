@@ -26,7 +26,7 @@ public class DepartmentEventProducer {
   );
 
   public void sendDepartmentEvent(Department dept, boolean isDelete) {
-    DepartmentEvent event = new DepartmentEvent(dept, isDelete);
+    DepartmentEvent event = new DepartmentEvent(dept,dept.getOrg(), isDelete);
     log.info("DepartmentEvent triggered ");
     log.info(event.toString());
 

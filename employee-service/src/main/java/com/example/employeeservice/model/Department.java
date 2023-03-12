@@ -1,15 +1,12 @@
 package com.example.employeeservice.model;
 
-import java.util.List;
-import jakarta.persistence.CascadeType;
+import com.example.employeeservice.model.Organization;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Department {
@@ -20,6 +17,11 @@ public class Department {
 	String deptName;
 	
 	String deptOwner;
+
+	@ManyToOne
+	@JoinColumn(name="org_id")
+	@JsonIgnore
+	Organization org;
 
 	public Department(String deptName, String deptOwner) {
 		super();
@@ -54,6 +56,12 @@ public class Department {
 		this.deptOwner = deptOwner;
 	}
 
+	public Organization getOrg() {
+		return org;
+	}
+	public void setOrg(Organization org) {
+		this.org = org;
+	}
 	@Override
 	public String toString() {
 		return "Department [deptId=" + deptId + ", deptName=" + deptName + ", deptOwner=" + deptOwner;

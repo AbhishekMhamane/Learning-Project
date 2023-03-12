@@ -7,10 +7,9 @@ import com.example.employeeservice.model.Organization;
 import com.example.employeeservice.repository.DepartmentRepository;
 import com.example.employeeservice.repository.EmployeeRepository;
 import com.example.employeeservice.repository.OrganizationRepository;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -49,6 +48,69 @@ public class EmployeeService {
     }
   }
 
+  public Employee getEmployeeById(Integer empId) {
+    try {
+      boolean isEmpPresent = empRepo.existsById(empId);
+
+      if (isEmpPresent) {
+        Optional<Employee> empOptional = empRepo.findById(empId);
+
+        Employee emp = empOptional.get();
+
+        return emp;
+      } else {
+        throw new HandleCustomException(
+          "400",
+          "Employee not present with given id"
+        );
+      }
+    } catch (HandleCustomException e) {
+      throw new HandleCustomException(e.getErrorCode(), e.getErrorMessage());
+    } catch (Exception e) {
+      throw new HandleCustomException("400", e.getMessage());
+    }
+  }
+
+  public List<Employee> getAllEmployeesByOrg(Integer orgId) {
+    try {
+      Organization org = getOrganizationById(orgId);
+
+      if (org != null) {
+        List<Employee> listEmp = empRepo.findByOrg(org);
+        return listEmp;
+      } else {
+        throw new HandleCustomException(
+          "400",
+          "Organization is not present by given id"
+        );
+      }
+    } catch (HandleCustomException e) {
+      throw new HandleCustomException(e.getErrorCode(), e.getErrorMessage());
+    } catch (Exception e) {
+      throw new HandleCustomException("400", e.getMessage());
+    }
+  }
+
+  public List<Employee> getAllEmployeesByDept(Integer deptId) {
+    try {
+      Department dept = getDepartmentById(deptId);
+
+      if (dept != null) {
+        List<Employee> listEmp = empRepo.findByDept(dept);
+        return listEmp;
+      } else {
+        throw new HandleCustomException(
+          "400",
+          "Department is not present by given id"
+        );
+      }
+    } catch (HandleCustomException e) {
+      throw new HandleCustomException(e.getErrorCode(), e.getErrorMessage());
+    } catch (Exception e) {
+      throw new HandleCustomException("400", e.getMessage());
+    }
+  }
+
   public Employee addEmployee(Integer orgId, Integer deptId, Employee emp) {
     try {
       Organization org = getOrganizationById(orgId);
@@ -62,9 +124,8 @@ public class EmployeeService {
                 if (
                   !emp.getMobileNo1().isBlank() && !emp.getMobileNo1().isEmpty()
                 ) {
-                  emp.setOrgId(orgId);
-                  emp.setDeptId(deptId);
-
+                  emp.setOrg(org);
+                  emp.setDept(dept);
                   return empRepo.save(emp);
                 } else {
                   throw new HandleCustomException("400", "Enter valid mobile");
@@ -97,50 +158,6 @@ public class EmployeeService {
     }
   }
 
-  public Employee getEmployeeById(Integer empId) {
-    try {
-      boolean isEmpPresent = empRepo.existsById(empId);
-
-      if (isEmpPresent) {
-        Optional<Employee> empOptional = empRepo.findById(empId);
-
-        Employee emp = empOptional.get();
-
-        return emp;
-      } else {
-        throw new HandleCustomException(
-          "400",
-          "Employee not present with given id"
-        );
-      }
-    } catch (HandleCustomException e) {
-      throw new HandleCustomException(e.getErrorCode(), e.getErrorMessage());
-    } catch (Exception e) {
-      throw new HandleCustomException("400", e.getMessage());
-    }
-  }
-
-  public List<Employee> getAllEmployeesByOrg(Integer orgId) {
-    try {
-      Organization org = getOrganizationById(orgId);
-
-      if (org != null) {
-        List<Employee> listEmp = empRepo.findByOrgId(orgId);
-
-        return listEmp;
-      } else {
-        throw new HandleCustomException(
-          "400",
-          "Organization is not present by given id"
-        );
-      }
-    } catch (HandleCustomException e) {
-      throw new HandleCustomException(e.getErrorCode(), e.getErrorMessage());
-    } catch (Exception e) {
-      throw new HandleCustomException("400", e.getMessage());
-    }
-  }
-
   public void deletetEmployeeById(Integer empId) {
     try {
       boolean isEmpPresent = empRepo.existsById(empId);
@@ -163,7 +180,7 @@ public class EmployeeService {
   public Employee updateEmployeeById(Integer empId, Employee emp) {
     try {
       Optional<Employee> empOptional = empRepo.findById(empId);
-
+  
       if (empOptional.isPresent()) {
         Employee empRecord = empOptional.get();
 
@@ -194,11 +211,6 @@ public class EmployeeService {
         ) {
           empRecord.setMobileNo2(emp.getMobileNo2());
         }
-        if (
-          emp.getDeptId() != null && emp.getDeptId() != empRecord.getDeptId()
-        ) {
-          empRecord.setDeptId(emp.getDeptId());
-        }
 
         return empRepo.save(empRecord);
       } else {
@@ -211,6 +223,35 @@ public class EmployeeService {
       throw new HandleCustomException(e.getErrorCode(), e.getErrorMessage());
     } catch (Exception e) {
       throw new HandleCustomException("400", e.getMessage());
+    }
+  }
+
+  public Employee updateEmployeeDepartment(Integer empId,Integer deptId)
+  {
+    try
+    {
+      Optional<Employee> opEmp = empRepo.findById(empId);
+      Optional<Department> opDept = deptRepo.findById(deptId);
+
+      if(opEmp.isPresent() && opDept.isPresent())
+      {
+          Employee emp = opEmp.get();
+          emp.setDept(opDept.get());
+          
+          return empRepo.save(emp);
+      }
+      else
+      {
+        throw new HandleCustomException("400","Wrong paramameters !");
+      }
+    }
+    catch(HandleCustomException e)
+    {
+      throw new HandleCustomException("400", e.getMessage());
+    }
+    catch(Exception e)
+    {
+      throw new HandleCustomException("500", e.getMessage());
     }
   }
 }
